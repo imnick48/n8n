@@ -216,6 +216,19 @@ watch(
 );
 
 watch(
+	() => props.mode,
+	() => {
+		if (showPreview.value) {
+			if (props.mode === 'workflow') {
+				loadWorkflow();
+			} else if (props.mode === 'execution') {
+				loadExecution();
+			}
+		}
+	},
+);
+
+watch(
 	() => props.executionId,
 	() => {
 		if (props.mode === 'execution' && props.executionId) {
@@ -233,7 +246,7 @@ watch(
 	},
 );
 
-defineExpose({ iframeRef });
+defineExpose({ iframeRef, reloadExecution: loadExecution });
 </script>
 
 <template>
