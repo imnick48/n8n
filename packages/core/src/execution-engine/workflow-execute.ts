@@ -78,6 +78,7 @@ import {
 	rewireGraph,
 	getNextExecutionIndex,
 } from './partial-execution-utils';
+import { computeNodeConfigHash } from './partial-execution-utils/compute-node-config-hash';
 import { handleRequest, isEngineRequest, makeEngineResponse } from './requests-response';
 import { RoutingNode } from './routing-node';
 import { TriggersAndPollers } from './triggers-and-pollers';
@@ -1849,6 +1850,7 @@ export class WorkflowExecute {
 						executionStatus: this.runExecutionData.waitTill ? 'waiting' : 'success',
 						usedDynamicCredentials:
 							this.additionalData.currentNodeUsedDynamicCredentials || undefined,
+						configHash: computeNodeConfigHash(executionNode),
 					};
 
 					if (executionError !== undefined) {
