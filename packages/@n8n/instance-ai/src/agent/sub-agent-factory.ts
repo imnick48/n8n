@@ -1,6 +1,8 @@
 import { Agent } from '@mastra/core/agent';
 import type { ToolsInput } from '@mastra/core/agent';
 
+import { SECRET_ASK_GUARDRAIL } from './credential-guardrails.prompt';
+import { getDateTimeSection } from './system-prompt';
 import { buildAgentTraceInputs, mergeTraceRunInputs } from '../tracing/langsmith-tracing';
 import type { InstanceAiTraceRun, ModelConfig } from '../types';
 
@@ -17,6 +19,9 @@ export interface SubAgentOptions {
 	modelId: ModelConfig;
 	/** Optional trace run to annotate with the sub-agent's static config */
 	traceRun?: InstanceAiTraceRun;
+	/** IANA time zone for the current user — used to render the datetime section so
+	 *  the sub-agent resolves "now" consistently with the orchestrator. */
+	timeZone?: string;
 }
 
 /** Hard protocol injected into every sub-agent — cannot be overridden by orchestrator instructions. */
@@ -40,12 +45,14 @@ Keep diagnostics to 2-3 sentences maximum. Omit entirely when the task succeeded
 - One tool call at a time unless truly independent. Minimum tool calls needed.
 - You cannot delegate to other agents or create plans.
 - If you are stuck or need information only a human can provide, use the ask-user tool.
+- ${SECRET_ASK_GUARDRAIL}
 - Do NOT retry the same failing approach more than twice — ask the user instead.`;
 
 export { SUB_AGENT_PROTOCOL };
 
-function buildSubAgentPrompt(role: string, instructions: string): string {
+function buildSubAgentPrompt(role: string, instructions: string, timeZone?: string): string {
 	return `${SUB_AGENT_PROTOCOL}
+${getDateTimeSection(timeZone)}
 
 You are a sub-agent with the role: ${role}.
 
@@ -54,9 +61,9 @@ ${instructions}`;
 }
 
 export function createSubAgent(options: SubAgentOptions): Agent {
-	const { agentId, role, instructions, tools, modelId, traceRun } = options;
+	const { agentId, role, instructions, tools, modelId, traceRun, timeZone } = options;
 
-	const systemPrompt = buildSubAgentPrompt(role, instructions);
+	const systemPrompt = buildSubAgentPrompt(role, instructions, timeZone);
 
 	const agent = new Agent({
 		id: agentId,
