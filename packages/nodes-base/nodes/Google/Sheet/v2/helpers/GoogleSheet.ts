@@ -588,7 +588,13 @@ export class GoogleSheet {
 				if (typeof updateValue === 'object') {
 					try {
 						updateValue = JSON.stringify(updateValue);
-					} catch (error) {}
+					} catch (error) {
+						// If stringify fails, keep the original object value
+						console.warn('Failed to stringify Google Sheets cell value:', {
+							columnName: name,
+							error: error instanceof Error ? error.message : error,
+						});
+					}
 				}
 				updateData.push({
 					range: `${decodedRange.name}!${columnToUpdate}${updateRowIndex}`,
@@ -635,7 +641,13 @@ export class GoogleSheet {
 				if (typeof updateValue === 'object') {
 					try {
 						updateValue = JSON.stringify(updateValue);
-					} catch (error) {}
+					} catch (error) {
+						// If stringify fails, keep the original object value
+						console.warn('Failed to stringify Google Sheets cell value by row:', {
+							columnName: name,
+							error: error instanceof Error ? error.message : error,
+						});
+					}
 				}
 				updateData.push({
 					range: `${decodedRange.name}!${columnToUpdate}${updateRowIndex}`,
