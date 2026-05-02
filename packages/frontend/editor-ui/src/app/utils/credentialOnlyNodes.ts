@@ -7,7 +7,7 @@ export function isCredentialOnlyNodeType(nodeTypeName: string): boolean {
 }
 
 export function getCredentialTypeName(nodeTypeName: string): string {
-	return nodeTypeName.split('.')[1];
+	return nodeTypeName.split('.')[1] ?? '';
 }
 
 export function getCredentialOnlyNodeTypeName(credentialTypeName: string): string {
